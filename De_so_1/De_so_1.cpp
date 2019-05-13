@@ -25,7 +25,7 @@ private:
 public:
     void readCustomerFile(){
         fstream f;
-        f.open("De_so_1/KH.DAT", ios::in);
+        f.open("KH.DAT", ios::in);
 
         if(f.fail()){
             cout << "Opening file failed!" << endl;
@@ -93,7 +93,7 @@ public:
 
     void writeCustomer(KhachHang cus){
         fstream f;
-        f.open("De_so_1/KH.DAT", ios::app);
+        f.open("KH.DAT", ios::app);
         if(f.fail()){
             cout << "Opening file fail" <<endl;
             return;
@@ -131,7 +131,7 @@ public:
 
     void writeProduct(MatHang pro){
         fstream f;
-        f.open("De_so_1/MATHANG.DAT", ios::app);
+        f.open("MATHANG.DAT", ios::app);
         if(f.fail()){
             cout << "Opening file fail" <<endl;
             return;
@@ -146,7 +146,7 @@ public:
 
     void readProductFile(){
         fstream f;
-        f.open("De_so_1/MATHANG.DAT", ios::in);
+        f.open("MATHANG.DAT", ios::in);
         if(f.fail()){
             cout << "Opening file fail" <<endl;
             return;
