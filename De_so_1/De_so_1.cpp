@@ -4,6 +4,7 @@
 #include<fstream>
 #include<vector>
 #include<sstream>
+#include<iomanip>
 using namespace std;
 
 class Nguoi{
@@ -176,7 +177,6 @@ public:
             }
             f.close();
         }
-        displayProduct();
     }
 
     void displayProduct(){
@@ -189,22 +189,72 @@ public:
 };
 
 class HoaDon{
-    friend class KhachHang;
 private:
-    KhachHang k;
-    MatHang m;
-    int soluong;
-    map<string, map<int, int> > ds;
+    map<int, map<int, int> > billLists;
+    map<int, int> productsList;
+    KhachHang kh; MatHang m;
+    vector<KhachHang> customerList;
+    vector<MatHang> products;
+
 public:
-    void nhapDSMuaHang(){
-        for(int i = 0; i < k.customers.size(); i++)
+    void enterBill(){
+        kh.readCustomerFile();
+        m.readProductFile();
+        customerList = kh.customers;
+        products = m.products;
+        cout << customerList.size() << " " << products.size() << endl;
+        for(int i = 0; i < customerList.size(); i++){
+            cout << "Nhap danh sach hang da mua cho " << customerList[i].hoTen << ":" << endl;
+            int productID = 0;
+            int number;
+            bool check = true;
+            while(productID != -1){
+                cin >> productID;
+
+                for(map<int, int>::iterator k = productsList.begin(); k != productsList.end(); k++){
+                    if(k->first == productID){
+                        check = false;
+                        cout << "Ma mat hang trung." << endl;
+                    }
+                }
+               /* if(check && productID != -1){
+                    do{
+                        cin >> productID;
+                        for(int j = 0;j < products.size(); j++){
+                            if(productID == products[j].maHang){
+                                productsList.insert(make_pair(productID, number));
+                            }
+                            else {
+                                check = false;
+                                cout << "Ma mat hang khong dung." << endl;
+                                cout << products[j].maHang << endl;
+                                break;
+                            }
+                        }
+                    } while(check == false);
+                }*/
+                cin >> number;
+            }
+            billLists.insert(make_pair(customerList[i].maKH, productsList));
+        }
+    }
+
+    void printBills(){
+        for(map<int, map<int, int> >::iterator i = billLists.begin(); i != billLists.end(); i++){
+           /*I cout << "Danh sach hang hoa cua khach co ID " << i->first << " la: " << endl;
+            cout << left << setw(20) << "Product ID" << setw(10) << "Number" << endl;
+            for(map<int, int>::iterator j = i->second.begin(); j != i->second.end(); j++){
+                cout << left << setw(20) << j->first << setw(10) << j->second << endl;
+            } */
+            cout << i->second.size() << endl;
+        }
     }
 
 };
 
 int main(){
-    MatHang mh;
-    mh.enterProduct();
-    mh.readProductFile();
+    HoaDon bill;
+    bill.enterBill();
+    bill.printBills();
     return 0;
 }
