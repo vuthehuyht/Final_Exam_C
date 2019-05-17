@@ -1,260 +1,263 @@
 #include<iostream>
 #include<string>
-#include<map>
+#include<iomanip>
 #include<fstream>
 #include<vector>
-#include<sstream>
-#include<iomanip>
 using namespace std;
 
 class Nguoi{
-protected:
-    string hoTen;
-    string diaChi;
-    string soDT;
+	protected:
+		string ten, diachi, sodt;
+	public:
+		Nguoi(){
+			ten = diachi = sodt = "";
+		}
 
-
-};
-
-class KhachHang : public Nguoi{
-    friend class HoaDon;
-private:
-    int maKH;
-    string nhomKH;
-    vector<KhachHang> customers;
-
-public:
-    void readCustomerFile(){
-        fstream f;
-        f.open("KH.DAT", ios::in);
-
-        if(f.fail()){
-            cout << "Opening file failed!" << endl;
-            return;
-        }
-        else {
-            string data;
-            int indexTemp = 1;
-            KhachHang cus;
-            while(!f.eof()){
-                getline(f, data);
-                if(indexTemp == 1){
-                    cus.hoTen = data;
-                    indexTemp++;
-                    continue;
-                }
-                if(indexTemp == 2){
-                    cus.diaChi = data;
-                    indexTemp++;
-                    continue;
-                }
-                if(indexTemp == 3){
-                    cus.soDT = data;
-                    indexTemp++;
-                    continue;
-                }
-                if(indexTemp == 4){
-                    stringstream ss(data);
-                    ss >> cus.maKH;
-                    indexTemp++;
-                    continue;
-                }
-                if(indexTemp == 5){
-                    cus.nhomKH = data;
-                    customers.push_back(cus);
-                    indexTemp = 1;
-                    continue;
-                }
-            }
-            f.close();
-        }
-    }
-
-    void displayCustomers(){
-        for(int i = 0;i < customers.size(); i++){
-            cout << customers[i].hoTen << endl;
-            cout << customers[i].diaChi << endl;
-            cout << customers[i].soDT << endl;
-            cout << customers[i].maKH << endl;
-            cout << customers[i].nhomKH << endl;
-        }
-    }
-
-    void enterCustomer(){
-        KhachHang cus;
-        fflush(stdin);
-        cout << "Nhap ten KH: "; getline(cin, cus.hoTen);
-        cout << "Nhap dia chi KH: "; getline(cin, cus.diaChi);
-        cout << "Nhap so DT KH: "; getline(cin, cus.soDT);
-        cout << "Nhap ma KH: "; cin >> cus.maKH;
-        cin.ignore();
-        cout << "Nhap nhom KH: "; getline(cin, cus.nhomKH);
-        writeCustomer(cus);
-    }
-
-    void writeCustomer(KhachHang cus){
-        fstream f;
-        f.open("KH.DAT", ios::app);
-        if(f.fail()){
-            cout << "Opening file fail" <<endl;
-            return;
-        }
-        else{
-            f << cus.hoTen << endl;
-            f << cus.diaChi << endl;
-            f << cus.soDT << endl;
-            f << cus.maKH << endl;
-            f << cus.nhomKH << endl;
-        }
-        f.close();
-    }
+		friend istream &operator>>( istream &in, Nguoi &n ){
+			cout<<"\nTen: " ; getline(cin, n.ten); in>>n.ten;
+			cout<<"\nDia chi: " ; getline(cin, n.diachi); in>>n.diachi;
+			cout<<"\nSo Dt: "; getline(cin, n.sodt) in>>n.sodt;
+		}
+		friend ostream &operator<<( ostream &out, Nguoi &n ){
+			out<<left<<setw(15)<<n.ten<<setw(15) <<n.diachi <<setw(15)<<n.sodt;
+		}
 
 };
+class KH: public Nguoi{
+	friend class BDS;
+	protected:
+		int maKH;
+		static int makh;
+		int loaikh;
+	public:
+		KH(){
+			loaikh = maKH = 0;
+		}
 
-class MatHang{
-    friend class HoaDon;
-private:
-    int maHang;
-    string tenHang;
-    int donGia;
-    vector<MatHang> products;
-
-public:
-    void enterProduct(){
-        MatHang pro;
-        fflush(stdin);
-        cout << "Nhap ma mat hang: "; cin >> pro.maHang;
-        cin.ignore();
-        cout << "Nhap ten hang: "; getline(cin, pro.tenHang);
-        cout << "Nhap don gia: "; cin >> pro.donGia;
-        writeProduct(pro);
-    }
-
-    void writeProduct(MatHang pro){
-        fstream f;
-        f.open("MATHANG.DAT", ios::app);
-        if(f.fail()){
-            cout << "Opening file fail" <<endl;
-            return;
-        }
-        else{
-            f << pro.maHang << endl;
-            f << pro.tenHang << endl;
-            f << pro.donGia << endl;
-        }
-        f.close();
-    }
-
-    void readProductFile(){
-        fstream f;
-        f.open("MATHANG.DAT", ios::in);
-        if(f.fail()){
-            cout << "Opening file fail" <<endl;
-            return;
-        } else {
-            string data;
-            int index = 1;
-            MatHang p;
-            while(!f.eof()){
-                getline(f, data);
-                if(index == 1){
-                    stringstream ss(data);
-                    ss >> p.maHang;
-                    index++;
-                    continue;
-                }
-                if(index == 2){
-                    p.tenHang = data;
-                    index++;
-                    continue;
-                }
-                if(index == 3){
-                    stringstream ss(data);
-                    ss >> p.donGia;
-                    products.push_back(p);
-                    index = 1;
-                }
-            }
-            f.close();
-        }
-    }
-
-    void displayProduct(){
-        for(int i = 0; i < products.size(); i++){
-            cout << products[i].maHang << endl;
-            cout << products[i].tenHang << endl;
-            cout << products[i].donGia << endl;
-        }
-    }
+		friend istream &operator>>( istream &in, KH &k ){
+			k.maKH =makh++;
+			Nguoi *n = reinterpret_cast<Nguoi*>(&k);
+			in>> *n;
+			do{
+				cout<<"\nLoai KH: \n1: mua le, \n2: mua Buon. "; in>>k.loaikh;
+			} while( k.loaikh < 1 || k.loaikh > 2 );
+			cout<<endl;
+		}
+		friend ostream &operator<<( ostream &out, KH &k ){
+				out<<setw(10)<< k.maKH;
+				Nguoi *n = reinterpret_cast<Nguoi*>(&k);
+				out<<*n;
+				if(k.loaikh == 1) out<<"Mua Le";
+				if(k.loaikh == 2) out<<"Mua Buon";
+				out<<endl;
+		}
+		void docN( fstream &ifs ){
+			ifs.read(reinterpret_cast<char*>(this), sizeof(KH));
+		}
+		void ghiK(){
+			ofstream ofs("KH.DAT",ios::app);
+			ofs.write(reinterpret_cast<const char*>(this), sizeof(KH)); ofs.close();
+		}
 };
 
-class HoaDon{
-private:
-    map<int, map<int, int> > billLists;
-    map<int, int> productsList;
-    KhachHang kh; MatHang m;
-    vector<KhachHang> customerList;
-    vector<MatHang> products;
-
-public:
-    void enterBill(){
-        kh.readCustomerFile();
-        m.readProductFile();
-        customerList = kh.customers;
-        products = m.products;
-        cout << customerList.size() << " " << products.size() << endl;
-        for(int i = 0; i < customerList.size(); i++){
-            cout << "Nhap danh sach hang da mua cho " << customerList[i].hoTen << ":" << endl;
-            int productID = 0;
-            int number;
-            bool check = true;
-            while(productID != -1){
-                cin >> productID;
-
-                for(map<int, int>::iterator k = productsList.begin(); k != productsList.end(); k++){
-                    if(k->first == productID){
-                        check = false;
-                        cout << "Ma mat hang trung." << endl;
-                    }
-                }
-               /* if(check && productID != -1){
-                    do{
-                        cin >> productID;
-                        for(int j = 0;j < products.size(); j++){
-                            if(productID == products[j].maHang){
-                                productsList.insert(make_pair(productID, number));
-                            }
-                            else {
-                                check = false;
-                                cout << "Ma mat hang khong dung." << endl;
-                                cout << products[j].maHang << endl;
-                                break;
-                            }
-                        }
-                    } while(check == false);
-                }*/
-                cin >> number;
-            }
-            billLists.insert(make_pair(customerList[i].maKH, productsList));
-        }
-    }
-
-    void printBills(){
-        for(map<int, map<int, int> >::iterator i = billLists.begin(); i != billLists.end(); i++){
-           /*I cout << "Danh sach hang hoa cua khach co ID " << i->first << " la: " << endl;
-            cout << left << setw(20) << "Product ID" << setw(10) << "Number" << endl;
-            for(map<int, int>::iterator j = i->second.begin(); j != i->second.end(); j++){
-                cout << left << setw(20) << j->first << setw(10) << j->second << endl;
-            } */
-            cout << i->second.size() << endl;
-        }
-    }
-
+class MH{
+	friend class BDS;
+	protected:
+		int maMH, nhom;
+		static int mamh;
+		string tenmh;
+		float giaban;
+	public:
+		MH(){
+			nhom = maMH = 0; tenmh = ""; giaban = 0.0;
+		}
+		friend istream &operator>>(istream &in, MH &m ){
+			m.maMH = mamh++;
+			cout<<"Ten MH: "; in>>m.tenmh;
+			do{
+				cout<<"\nNhom MH: \n1: TT. \n2: TD. \n3: DM. \n4: GD. "; in>>m.nhom;
+			} while( m.nhom < 1 || m.nhom > 4);
+			cout<<"\nGia ban: "; in>>m.giaban;
+		}
+		friend ostream &operator<<(ostream &out, MH &m ){
+			out<<left<<setw(10)<<m.maMH <<setw(15)<<m.tenmh<<setw(12);
+			if( m.nhom == 1 ) out<<"TT.";
+			if( m.nhom == 2 ) out<<"TD.";
+			if( m.nhom == 3 ) out<<"DM.";
+			if( m.nhom == 4 ) out<<"GD.";
+			out<<m.giaban<<setw(10);
+		}
+		void ghiMH(){
+			ofstream ofs("MH.DAT",ios::app);
+			ofs.write(reinterpret_cast<const char*>(this), sizeof(MH));
+		}
+		void docMH( fstream &ifs ){
+			ifs.read(reinterpret_cast <char*>(this), sizeof(MH));
+		}
 };
+int MH::mamh = 1000;
+int KH::makh = 10000;
+
+class BDS{
+	protected:
+		KH k;
+		vector<MH> mh;
+		int sl;
+		vector<int> sluong;
+	public:
+		BDS(){
+			sl = 0;
+		}
+		void nhapB( KH k1, MH m[], int n ){
+			k = k1;
+			cout<<"\nNhap thong tin cho KH "<< k.ten<<" : ";
+			do{
+				cout<<"\nSo luong MH mua( sl < 10 ): "; cin>>sl;
+			} while( sl > 10 );
+			for( int i = 0; i < sl; i++ ){
+				int ma, ok, kt, s;
+				do{
+					ok = kt = 0;
+					cout<<"\nNhap ma MH: "; cin>> ma;
+					if( ma < 1000 || (ma > m[n-1].maMH) ) ok = 1;
+					for(int j = 0; j< n; j++ )
+						if( ma == m[j].maMH ) mh.push_back( m[j] );
+					for(int j = 0; j< i; j++ )
+						if( ma == mh[j].maMH ) kt = 1;
+				} while( ok || kt );
+				cout<<"\nNhap so luong hang mua : "; cin>> s;
+				if( s >= 0 ) sluong.push_back( s );
+			}
+		}
+		void xuatB(){
+			cout<<left<<setw(10)<<"Ma KH"<<setw(15)<<"Ten KH"<<setw(15)<<"Dia Chi" <<setw(15)
+				<<"So DT"<<setw(12)<<"Loai KH"<<endl;
+			cout<< k;
+			cout<< "\nTong so loai MH mua: " << sl << endl;
+			cout<< left << setw(10) <<"Ma MH" << setw(15) << "Ten MH" << setw(12) << "Nhom MH"
+				<< setw(10) << "Gia Ban" << setw(10) << "SLuong" << endl;
+			for(int i = 0; i< sl; i++ ){
+				cout<< mh[i];
+				cout<< right << sluong[i] << endl;
+			}
+			cout<<endl;
+		}
+		void docB( fstream &ifs ){
+			ifs.read(reinterpret_cast<char*>(this),sizeof(BDS));
+		}
+		void ghiB(){
+			ofstream ofs("QLBH.DAT",ios::app);
+			ofs.write(reinterpret_cast<const char*>(this),sizeof(BDS));
+			ofs.close();
+		}
+		void sapxep( BDS b[], int n ){
+			int lc;
+			do{
+				cout<<"\n_____Options Sort_____\n";
+				cout<<"\n1: Sort by Client Name. \n2: Sort by Product Name. \n0: return main MENU."
+					<<"\nEnter your choice ? "; cin>>lc;
+				switch( lc ){
+					case 1:{
+						for( int i = 0; i < n; i++ )
+							for( int j = i+1; j < n; j++ )
+								if( b[i].k.ten > b[j].k.ten ) swap( b[i], b[j] );
+							cout<<"\n___Infomation After Sort___\n";
+							for( int i = 0; i < n; i++ )
+								b[i].xuatB();
+						break;
+					}
+					case 2:{
+						for( int i = 0; i < n; i++ )
+							for(int j = 0; j < b[i].sl; j++ )
+								for(int k = j+1; k < b[i].sl; k++ )
+									if( b[i].mh[j].tenmh > b[i].mh[k].tenmh  )
+										swap( b[i].mh[j], b[i].mh[k]  );
+							cout<<"\n___Infomation After Sort___\n";
+							for(int i = 0; i< n; i++ )
+								b[i].xuatB();
+						break;
+					}
+					case 0: break;
+				}
+			}while ( lc != 0 );
+		}
+		void hoaDon( BDS b[], int n ){
+			cout<<"\n______Recipt Table______\n";
+			cout<<left<<setw(10)<<"Ma KH" <<setw(15) <<"Ten KH" <<setw(10) <<"SLM"<< setw(12)
+				<<"Tong HD" <<endl;
+			for( int i = 0; i< n; i++ ){
+				float phi = 0;
+				for(int j = 0; j < b[i].sl; j++ )
+					phi+= b[i].sluong[j] * b[i].mh[j].giaban;
+				cout<<left<<setw(10)<< b[i].k.maKH <<setw(15)<<b[i].k.ten<< setw(10)<< b[i].sl
+					<<setw(12)<<phi<<endl;
+			}
+		}
+};
+
+void menu(){
+	fstream f("MH.DAT",ios::out); fstream f1("KH.DAT",ios::out); fstream f2("QLBH.DAT",ios::out);
+	int somh = 0, sokh = 0, sobds = 0, lc = 0, slkh = 0, slmh = 0, slbds = 0;
+	KH kh1[100], kh2[100]; MH mh1[100], mh2[100]; BDS bds1[100], bds2[100], dss;
+	do{
+		cout<<"\n_____Menu Options____\n1: y 1. \n2: y 2. \n3: y 3. \n4: y 4. \n5; y 5. \n0: Exit."
+			<<"\nEnter your choice ? "; cin>> lc;
+		switch( lc ){
+			case 1:{
+				int n; cout<<"\n So luong KH muon them: "; cin>>n;
+				for( int i = sokh; i < sokh + n; i++ ){
+					cout<<"\nThong tin KH thu "<<i+1 <<" : ";
+					cin>>kh1[i]; kh1[i].ghiK();
+				} sokh+= n;
+				cout<<"\n___THONG TIN CO TRONG FILE___\n";
+				cout<<left<<setw(10)<<"Ma KH"<<setw(15)<<"Ten KH"<<setw(15)<<"Dia Chi" <<setw(15)
+				<<"So DT"<<setw(12)<<"Loai KH"<<endl;
+				fstream ifs("KH.DAT",ios::in);
+				if(!ifs) { cout<<"\nFile could not be opened!";  }
+				while( ifs ){
+					kh2[slkh].docN(ifs);
+					if(!ifs.eof()) cout<< kh2[slkh]; slkh++;
+				} ifs.close(); slkh--;
+				break;
+			}
+			case 2:{
+				int n; cout<<"\n So luong MH muon them: "; cin>>n;
+				for( int i = somh; i < somh + n; i++ ){
+					cout<<"\nThong tin MH thu "<<i+1 <<" : ";
+					cin>> mh1[i]; mh1[i].ghiMH();
+				} somh+= n;
+				cout<<"\n___THONG TIN CO TRONG FILE___\n";
+				cout<<left<<setw(10)<<"Ma MH" <<setw(15)<<"Ten MH" <<setw(12) <<"Nhom MH"
+				<<setw(10)<<"Gia Ban" <<endl;
+				fstream ifs("MH.DAT",ios::in);
+				if(!ifs) { cout<<"\nFile could not be opened!";  }
+				while( ifs ){
+					mh2[slmh].docMH(ifs);
+					if(!ifs.eof()) cout<< mh2[slmh];cout<<endl; slmh++;
+				} ifs.close(); slmh--;
+				break;
+			}
+			case 3:{
+				for( int i = sobds; i < sokh; i++ ){
+					bds1[i].nhapB( kh2[i], mh2, slmh ); bds1[i].ghiB();
+				} sobds = sokh;
+				cout<<"\n___THONG TIN CO TRONG FILE___\n";
+				fstream ifs("QLBH.DAT",ios::in);
+				if(!ifs) { cout<<"\nFile could not be opened!";  }
+				while( ifs ){
+					bds2[slbds].docB(ifs);
+					if(!ifs.eof()) bds2[slbds].xuatB(); cout<<endl; slbds++;
+				} ifs.close(); slbds--;
+				break;
+			}
+			case 4:  dss.sapxep( bds2, slbds ); break;
+			case 5:  dss.hoaDon( bds2, slbds ); break;
+			case 0: cout<<"\nThe End.";
+		}
+	} while( lc != 0 );
+}
 
 int main(){
-    HoaDon bill;
-    bill.enterBill();
-    bill.printBills();
-    return 0;
+	menu();
+	return 0;
 }
