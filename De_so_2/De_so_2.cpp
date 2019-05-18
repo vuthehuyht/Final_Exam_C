@@ -34,14 +34,14 @@ public:
             cout << "Nhap so DT: "; cin.getline(d.phoneNumber, 11);
             d.driverID = driverIDConst++;
             cout << "Nhap trinh do: "; cin >> d.levelDriver;
-            if(d.levelDriver < 'a' && d.levelDriver <= 'z')
-                d.levelDriver -= 32;
+            if(d.levelDriver >= 'a' && d.levelDriver <= 'z')
+                d.levelDriver = d.levelDriver - 32;
             while(d.levelDriver < 'A' || d.levelDriver > 'F'){
                 cout << "Nhap trinh lai do: "; cin >> d.levelDriver;
             }
             drivers.push_back(d);
         }
-        //writeToFile();
+        writeToFile();
     }
 
     void writeToFile(){
@@ -73,6 +73,18 @@ public:
                     setw(12) << phoneNumber << setw(10) << levelDriver << endl;
             }
         }
+    }
+
+    void readOneByOne(ifstream &ifs){
+        ifs.read(reinterpret_cast<char*>(this), sizeof(Driver));
+    }
+
+    void driverInfor(){
+        cout << "Ho ten: " << fullName << endl;
+        cout << "Dia chi: " << address << endl;
+        cout << "So DT: " << phoneNumber << endl;
+        cout << "Ma LX:" << driverID << endl;
+        cout << "Trinh do LX: " << levelDriver << endl;
     }
 };
 
@@ -131,19 +143,178 @@ public:
             ifs.close();
         }
     }
+
+    void busInfor(){
+        cout << "Ma tuyen: " << busID << endl;
+        cout << "Khoang cach: " << range << endl;
+        cout << "So diem dung: " << numberOfStops << endl;
+    }
+
+    void readOneByOne(ifstream &ifs){
+        ifs.read(reinterpret_cast<char*>(this), sizeof(Buses));
+    }
 };
 
 class AssignTable {
 private:
+    int busesTotal;
     Driver d;
-    vector<Buses> busesList;
-    int number;
-    vector<int> numberOfTurnList;
+    Buses busesList[100];
+    int numberOfTurnList[100] = {0};
+public:
+    void addWord(Driver driver){
+        vector<Buses> buses;
+        ifstream ifs("TUYEN.DAT");
+
+        while(ifs){
+            Buses b;
+            b.readOneByOne(ifs);
+            if(!ifs.eof())
+                buses.push_back(b);
+        }
+        cout << "Size vector buses: " << buses.size() << endl;
+       cout << "Nhap thong tin phan cong cho " << driver.fullName << ": " << endl;
+       d = driver;
+       do{
+        cout << "Nhap so luong tuyen muon chay: "; cin >> busesTotal;
+       } while(busesTotal < 0 || busesTotal > 16);
+
+       for(int i = 0; i < busesTotal; i++){
+            int busIDTemp, mark = 1, counter = 0;
+            do{
+                cout << "Nhap ma tuyen: "; cin >> busIDTemp;
+                for(int j = 0; j < buses.size(); j++){
+                    if(busIDTemp == buses[j].busID){
+                        mark = 0;
+                        busesList[i] = buses[j];
+                    }
+                }
+
+                for(int k = 0; k < i; k++){
+                    if(busesList[k].busID == busIDTemp)
+                        mark = 1;
+                }
+            } while(mark);
+            int number;
+            do{
+                cout << "Nhap so luot chay: "; cin >> number;
+                numberOfTurnList[i] = number;
+            } while(number< 0 || number > 16);
+       }
+       write();
+    }
+
+    void write(){
+        ofstream ofs("PHANCONG.DAT", ios::app);
+        ofs.write(reinterpret_cast<const char*>(this), sizeof(AssignTable));
+        ofs.close();
+    }
+
+    void readOneByOne(ifstream &ifs){
+        ifs.read(reinterpret_cast<char*>(this), sizeof(AssignTable));
+    }
+
+    void workInfor(){
+        cout << "Ho ten LX: " << d.fullName << endl;
+        cout << "Tong so chuyen chay: " << busesTotal << endl;
+        cout << "Thong tin cac chuyen chay:" << endl;
+        cout << left << setw(10) << "Ma chuyen" << setw(15) << "Khoang cach" << setw(15) << "So chuyen" << endl;
+        for(int i = 0; i < busesTotal; i++)
+            cout << left << setw(10) << busesList[i].busID << setw(15) << busesList[i].range << setw(15)<< numberOfTurnList[i] << endl;
+    }
+
+    char* getName(){
+        return d.fullName;
+    }
+
+    void sortByName(){
+        vector<AssignTable> temp;
+        ifstream ifs("PHANCONG.DAT");
+        while(!ifs.eof()){
+            AssignTable a;
+            a.readOneByOne(ifs);
+            if(!ifs.eof()){
+                temp.push_back(a);
+            }
+        }
+        ifs.close();
+        //cout << "Size temp: " << temp.size() << endl;
+        for(int i = 0; i < temp.size() - 1; i++){
+            for(int j = i + 1; j < temp.size(); j++){
+                if(strcmp(temp[i].getName(), temp[j].getName()) > 0)
+                    swap(temp[i], temp[j]);
+            }
+        }
+        cout << "Thong tin sau khi sap xep la:" << endl;
+        for(int i = 0; i < temp.size(); i++)
+            temp[i].workInfor();
+    }
+
+    void sortByTurn(){
+        vector<AssignTable> temp;
+        ifstream ifs("PHANCONG.DAT");
+        while(!ifs.eof()){
+            AssignTable a;
+            a.readOneByOne(ifs);
+            if(!ifs.eof()){
+                temp.push_back(a);
+            }
+        }
+        ifs.close();
+        //cout << "Size temp: " << temp.size() << endl;
+        for(int i = 0; i < temp.size() - 1; i++){
+            for(int j = i + 1; j < temp.size(); j++){
+                if(temp[i].busesTotal < temp[j].busesTotal)
+                    swap(temp[i], temp[j]);
+            }
+        }
+        cout << "Thong tin sau khi sap xep la:" << endl;
+        for(int i = 0; i < temp.size(); i++)
+            temp[i].workInfor();
+    }
+
+    void thongke(){
+        vector<AssignTable> temp;
+        ifstream ifs("PHANCONG.DAT");
+        while(!ifs.eof()){
+            AssignTable a;
+            a.readOneByOne(ifs);
+            if(!ifs.eof()){
+                temp.push_back(a);
+            }
+        }
+        ifs.close();
+        cout << left << setw(15) << "Ho ten LX" << setw(10) << "Quang duong" << endl;
+        for(int i = 0; i < temp.size(); i++){
+            int sum = 0;
+            for(int j = 0; j < temp[i].busesTotal; j++){
+                sum += (temp[i].busesList[j].range * temp[i].busesList[j].numberOfStops);
+            }
+            cout << left << setw(15) << temp[i].getName() << setw(10) << sum / 2<< endl;
+        }
+    }
 };
 int Driver::driverIDConst = 10000;
 int Buses::busIDConst = 100;
 int main(){
-    Driver d;
+    /*Driver d;
     d.addDriver();
+    Buses b;
+    b.addBus();
+    AssignTable a;
+    ifstream ifs("LX.DAT");
+    vector<Driver> drs;
+    while(ifs){
+        Driver d;
+        d.readOneByOne(ifs);
+        if(!ifs.eof())
+            drs.push_back(d);
+    }
+    for(int i = 0;i < drs.size(); i++)
+        a.addWord(drs[i]);
+    */
+    AssignTable a;
+    a.sortByTurn();
+    a.thongke();
     return 0;
 }
