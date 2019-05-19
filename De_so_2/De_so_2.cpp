@@ -79,13 +79,6 @@ public:
         ifs.read(reinterpret_cast<char*>(this), sizeof(Driver));
     }
 
-    void driverInfor(){
-        cout << "Ho ten: " << fullName << endl;
-        cout << "Dia chi: " << address << endl;
-        cout << "So DT: " << phoneNumber << endl;
-        cout << "Ma LX:" << driverID << endl;
-        cout << "Trinh do LX: " << levelDriver << endl;
-    }
 };
 
 class Buses{
@@ -142,12 +135,6 @@ public:
             }
             ifs.close();
         }
-    }
-
-    void busInfor(){
-        cout << "Ma tuyen: " << busID << endl;
-        cout << "Khoang cach: " << range << endl;
-        cout << "So diem dung: " << numberOfStops << endl;
     }
 
     void readOneByOne(ifstream &ifs){

@@ -74,11 +74,60 @@ public:
     }
 };
 
+class Service{
+private:
+    static int serviceIDConst;
+    int serviceID;
+    char serviceName[30];
+    int servicePrice;
+    char calUnit[30];
+public:
+    void addService(){
+        cout << "Nhap so luong dich vu muon them: ";
+        int num; cin >> num;
+        for(int i = 0; i < num; i++){
+            cout << "Nhap thong tin cho dich vu thu " << i + 1 << ":" << endl;
+            Service s;
+            fflush(stdin);
+            s.serviceID = serviceIDConst++;
+            cout << "Nhap ten dich vu: "; cin.getline(s.serviceName, 30);
+            cout << "Nhap gia cuoc: "; cin >> s.servicePrice;
+            cin.ignore();
+            cout << "Nhap don vi tinh: "; cin.getline(s.calUnit, 30);
+            writeToFile(s);
+        }
+    }
+    void writeToFile(Service s){
+        ofstream ofs("DV.DAT", ios::app);
+        ofs.write(reinterpret_cast<const char*>(&s), sizeof(Service));
+        ofs.close();
+    }
+
+    void readOneByOne(ifstream &ifs){
+        ifs.read(reinterpret_cast<char*>(this), sizeof(Service));
+    }
+
+    void displayAllService(){
+        cout << "----------Thong tin cua cac dich vu----------" << endl;
+        cout << left << setw(10) << "Ma DV" << setw(20) << "Ten DV"<< setw(20) << "Gia DV" <<
+            setw(12) << "Don vi tinh" << endl;
+        ifstream ifs("DV.DAT");
+        while(ifs){
+            Service s;
+            s.readOneByOne(ifs);
+            if(!ifs.eof())
+                cout << left << setw(10) << s.serviceID << setw(20) << s.serviceName << setw(20) << s.servicePrice << setw(12) << s.calUnit << endl;
+        }
+        ifs.close();
+    }
+};
+
 int Customer::custormerIDConst = 10000;
+int Service::serviceIDConst = 100;
 
 int main(){
-    Customer c;
-    c.addCustomer();
-    c.displayAllCustomer();
+    Service s;
+    s.addService();
+    s.displayAllService();
     return 0;
 }
