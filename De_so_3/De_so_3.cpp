@@ -14,6 +14,7 @@ protected:
 };
 
 class Customer:public Person{
+    friend class Bill;
 private:
     static int custormerIDConst;
     int customerID;
@@ -75,6 +76,7 @@ public:
 };
 
 class Service{
+    friend class Bill;
 private:
     static int serviceIDConst;
     int serviceID;
@@ -122,12 +124,98 @@ public:
     }
 };
 
+class Bill{
+private:
+    int serviceTotal;
+    Customer customer;
+    Service s[100];
+    int numberOfService[100] = {0};
+public:
+    void addBill(Customer cus){
+        vector<Service> services;
+        ifstream ifs("DV.DAT");
+        while(ifs){
+            Service s;
+            s.readOneByOne(ifs);
+            if(!ifs.eof())
+                services.push_back(s);
+        }
+        cout << "Nhap thong tin hoa don cho " << cus.fullName << ": " << endl;
+        customer = cus;
+        cout << "Nhap so luong dich vu: "; cin >> serviceTotal;
+        for(int i = 0; i < serviceTotal; i++){
+            fflush(stdin);
+            int serID, mark = 1;
+            do{
+                cout << "Nhap ma DV: "; cin >> serID;
+                for(int j = 0; j < services.size(); j++){
+                    if(serID == services[j].serviceID){
+                        mark = 0;
+                        s[i] = services[j];
+                }
+            }
+                for(int k = 0; k < i; k++){
+                    if(serID == services[k].serviceID)
+                    mark = 1;
+                }
+            } while(mark);
+            int number = 0;
+            cout << "Nhap so lan da dung: "; cin >> numberOfService[i];
+            write();
+        }
+    }
+    void write(){
+        ofstream ofs("HD.DAT", ios::app);
+        ofs.write(reinterpret_cast<const char*>(this), sizeof(Bill));
+        ofs.close();
+    }
+
+    void readOneByOne(ifstream &ifs){
+        ifs.read(reinterpret_cast<char*>(this), sizeof(Bill));
+    }
+
+    void billInfor(){
+        cout << "Ho ten KH: " << customer.fullName << endl;
+        cout << "Tong so dich vu da dung: " << serviceTotal << endl;
+        cout << left << setw(10) << "Ten DV" << setw(15) << "Gia DV" << setw(15) << "Don vi tinh" << setw(15) << "So lan su dung" << endl;
+        for(int i = 0; i < serviceTotal; i++)
+            cout << left << setw(10) << s[i].serviceName << setw(15) << s[i].servicePrice << setw(15) << s[i].calUnit<< setw(15) << numberOfService[i] << endl;
+    }
+
+    void displayAllBill(){
+        ifstream ifs("HD.DAT");
+        while(ifs){
+            Bill b;
+            b.readOneByOne(ifs);
+            if(!ifs.eof());
+                b.billInfor();
+        }
+        ifs.close();
+    }
+};
+
 int Customer::custormerIDConst = 10000;
 int Service::serviceIDConst = 100;
 
 int main(){
-    Service s;
-    s.addService();
-    s.displayAllService();
+//    Customer c;
+//    c.addCustomer();
+//    c.displayAllCustomer();
+//    Service s;
+//    s.addService();
+//    s.displayAllService();
+    vector<Customer> cs;
+    ifstream ifs("KH.DAT");
+    while(ifs){
+        Customer c;
+        c.readOneByOne(ifs);
+        if(!ifs.eof())
+            cs.push_back(c);
+    }
+    ifs.close();
+    Bill b;
+    for(int i = 0; i < cs.size(); i++)
+        b.addBill(cs[i]);
+    b.displayAllBill();
     return 0;
 }

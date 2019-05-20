@@ -301,7 +301,7 @@ int main(){
         a.addWord(drs[i]);
     */
     AssignTable a;
-    a.sortByTurn();
+   // a.sortByTurn();
     a.thongke();
     return 0;
 }
