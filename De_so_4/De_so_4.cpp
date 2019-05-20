@@ -121,8 +121,11 @@ private:
     TicketBuyer tb;
     int ticketTotal;
     Ticket t[100];
-    int numOfTicket[100];
+    int numOfTicket[100]= {0};
 public:
+    Bill(){
+        ticketTotal = 0;
+    }
     void addBill(TicketBuyer _tb){
         vector<Ticket> ts;
         ifstream ifs("VE.DAT");
@@ -155,8 +158,9 @@ public:
             do{
                 cout << "Nhap so luong: "; cin >> numOfTicket[i];
             }while(numOfTicket[i] < 1 || numOfTicket[i] > 20);
-            writeToFile();
         }
+      //  detailBill();
+        writeToFile();
     }
     void writeToFile(){
         ofstream ofs("HOADON.DAT", ios::app);
@@ -181,7 +185,6 @@ public:
             Bill b;
             b.readOneByOne(ifs);
             if(!ifs.eof())
-            cout << "*" << endl;
                 b.detailBill();
         }
         ifs.close();
@@ -190,17 +193,18 @@ public:
 int TicketBuyer::ticketBuyerIDConst = 10000;
 int Ticket::ticketIDConst = 100;
 int main(){
-//    vector<TicketBuyer> tbs;
-//    ifstream ifs("NGUOIMUA.DAT");
-//    while(ifs){
-//        TicketBuyer tb;
-//        tb.readOneByOne(ifs);
-//        if(!ifs.eof())
-//            tbs.push_back(tb);
-//    }
-    Bill b;
-//    for(int i = 0; i < tbs.size(); i++)
-//        b.addBill(tbs[i]);
-    b.displayAllBill();
+    vector<TicketBuyer> tbs;
+    ifstream ifs("NGUOIMUA.DAT");
+    while(ifs){
+        TicketBuyer tb;
+        tb.readOneByOne(ifs);
+        if(!ifs.eof())
+            tbs.push_back(tb);
+    }
+    Bill b[tbs.size()];
+    for(int i = 0; i < tbs.size(); i++)
+        b[i].addBill(tbs[i]);
+    Bill b1;
+    b1.displayAllBill();
     return 0;
 }

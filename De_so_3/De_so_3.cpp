@@ -126,19 +126,21 @@ public:
 
 class Bill{
 private:
-    int serviceTotal;
     Customer customer;
-    Service s[100];
+    int serviceTotal;
     int numberOfService[100] = {0};
+    Service s[100];
 public:
+    Bill(){
+        serviceTotal = 0;
+    }
     void addBill(Customer cus){
         vector<Service> services;
         ifstream ifs("DV.DAT");
-        while(ifs){
+        while(!ifs.eof()){
             Service s;
             s.readOneByOne(ifs);
-            if(!ifs.eof())
-                services.push_back(s);
+            services.push_back(s);
         }
         cout << "Nhap thong tin hoa don cho " << cus.fullName << ": " << endl;
         customer = cus;
@@ -159,10 +161,10 @@ public:
                     mark = 1;
                 }
             } while(mark);
-            int number = 0;
             cout << "Nhap so lan da dung: "; cin >> numberOfService[i];
-            write();
+            cout << "Number inputed: " << i << " = " << numberOfService[i] << endl;
         }
+        write();
     }
     void write(){
         ofstream ofs("HD.DAT", ios::app);
@@ -184,13 +186,81 @@ public:
 
     void displayAllBill(){
         ifstream ifs("HD.DAT");
-        while(ifs){
+        while(!ifs.eof()){
             Bill b;
             b.readOneByOne(ifs);
-            if(!ifs.eof());
-                b.billInfor();
+            b.billInfor();
         }
         ifs.close();
+    }
+    char* getName(){
+        return customer.fullName;
+    }
+    void sortByName(){
+        vector<Bill> bills;
+        ifstream ifs("HD.DAT");
+        while(!ifs.eof()){
+            Bill b;
+            b.readOneByOne(ifs);
+            bills.push_back(b);
+        }
+        ifs.close();
+        cout << "Size bills: " << bills.size() << endl;
+        for(int i = 0; i < bills.size() - 1; i++){
+            for(int j = i + 1; j < bills.size(); j++){
+                if(strcmp(bills[i].getName(), bills[j].getName()) > 0)
+                    swap(bills[i], bills[j]);
+            }
+        }
+        cout << "Thong tin sau khi sap xep" << endl;
+        for(int i = 0; i < bills.size(); i++)
+            bills[i].billInfor();
+    }
+
+    void sortByNum(){
+        vector<Bill> bills;
+        ifstream ifs("HD.DAT");
+        while(!ifs.eof()){
+            Bill b;
+            b.readOneByOne(ifs);
+            bills.push_back(b);
+        }
+        ifs.close();
+        for(int i = 0; i < bills.size(); i++){
+            for(int j = 0; j < bills[i].serviceTotal - 1; j++){
+                bool swapped = false;
+                for(int k = 0; k < bills[i].serviceTotal - j - 1; k++){
+                    if(bills[i].numberOfService[k] < bills[i].numberOfService[k + 1]){
+                        swap(bills[i].numberOfService[k], bills[i].numberOfService[k + 1]);
+                        swapped = true;
+                    }
+                }
+                if (swapped == false)
+                    break;
+            }
+        }
+        cout << "Thong tin sau khi sap xep" << endl;
+        for(int i = 0; i < bills.size(); i++)
+            bills[i].billInfor();
+    }
+
+    void thongke(){
+        vector<Bill> bills;
+        ifstream ifs("HD.DAT");
+        while(!ifs.eof()){
+            Bill b;
+            b.readOneByOne(ifs);
+            bills.push_back(b);
+        }
+        ifs.close();
+        cout << "So tien moi khach can tra" << endl;
+        cout << left << setw(15) <<  "Ho ten KH" << setw(15) << "So tien can tra" << endl;
+        for(int i = 0; i < bills.size(); i++){
+            int sum = 0;
+            for(int j = 0; j < bills[i].serviceTotal; j++)
+                sum += bills[i].numberOfService[j] * bills[i].s[j].servicePrice;
+            cout << left << setw(15) << bills[i].getName() << setw(15) << sum << endl;
+        }
     }
 };
 
@@ -204,18 +274,22 @@ int main(){
 //    Service s;
 //    s.addService();
 //    s.displayAllService();
-    vector<Customer> cs;
-    ifstream ifs("KH.DAT");
-    while(ifs){
-        Customer c;
-        c.readOneByOne(ifs);
-        if(!ifs.eof())
-            cs.push_back(c);
-    }
-    ifs.close();
+//    vector<Customer> cs;
+//    ifstream ifs("KH.DAT");
+//    while(ifs){
+//        Customer c;
+//        c.readOneByOne(ifs);
+//        if(!ifs.eof())
+//            cs.push_back(c);
+//    }
+//    ifs.close();
+//    Bill b[cs.size()];
+//    for(int i = 0; i < cs.size(); i++)
+//        b[i].addBill(cs[i]);
+//    Bill b1;
+//    b1.sortByName();
     Bill b;
-    for(int i = 0; i < cs.size(); i++)
-        b.addBill(cs[i]);
     b.displayAllBill();
+    b.thongke();
     return 0;
 }
