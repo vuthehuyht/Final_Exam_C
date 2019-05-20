@@ -56,7 +56,7 @@ public:
         cout << "----------Thong tin cua cac nguoi mua----------" << endl;
         cout << left << setw(10) << "Ma NM" << setw(15) << "Ho ten NM" << setw(15) << "Dia chi" << setw(15) << "So DT" << setw(15) << "Loai NM" << endl;
         ifstream ifs("NGUOIMUA.DAT");
-        while(ifs){
+        while(!ifs.eof()){
             TicketBuyer tb;
             tb.readOneByOne(ifs);
             if(!ifs.eof())
@@ -120,8 +120,8 @@ class Bill{
 private:
     TicketBuyer tb;
     int ticketTotal;
+    int numOfTicket[100]= {0};\
     Ticket t[100];
-    int numOfTicket[100]= {0};
 public:
     Bill(){
         ticketTotal = 0;
@@ -159,7 +159,6 @@ public:
                 cout << "Nhap so luong: "; cin >> numOfTicket[i];
             }while(numOfTicket[i] < 1 || numOfTicket[i] > 20);
         }
-      //  detailBill();
         writeToFile();
     }
     void writeToFile(){
@@ -181,7 +180,7 @@ public:
     }
     void displayAllBill(){
         ifstream ifs("HOADON.DAT");
-        while(ifs){
+        while(!ifs.eof()){
             Bill b;
             b.readOneByOne(ifs);
             if(!ifs.eof())
@@ -189,22 +188,83 @@ public:
         }
         ifs.close();
     }
+
+    char* getName(){
+        return tb.fullName;
+    }
+
+    vector<Bill> getBillVector(){
+        vector<Bill> bills;
+        ifstream ifs("HOADON.DAT");
+        while(!ifs.eof()){
+            Bill b;
+            b.readOneByOne(ifs);
+            if(!ifs.eof())
+                bills.push_back(b);
+        }
+        ifs.close();
+        return bills;
+    }
+
+    void sortByName(){
+        vector<Bill> temp = getBillVector();
+        for(int i = 0; i < temp.size() - 1; i++){
+            for(int j = i + 1; j < temp.size(); j++)
+                if(strcmp(temp[i].getName(), temp[j].getName()) > 0)
+                    swap(temp[i], temp[j]);
+        }
+        cout << "Danh sach sau khi sap xep la:" << endl;
+        for(int i = 0; i < temp.size(); i++)
+            temp[i].detailBill();
+    }
+
+    void sortByTurn(){
+        vector<Bill> temp = getBillVector();
+        for(int i = 0; i < temp.size(); i++){
+            for(int j = 0; j < temp[i].ticketTotal - 1; j++){
+                bool swapped = false;
+                for(int k = 0;k < temp[i].ticketTotal - j - 1; k++){
+                    if(temp[i].numOfTicket[k] < temp[i].numOfTicket[k + 1]){
+                        swapped = true;
+                        swap(temp[i].numOfTicket[k], temp[i].numOfTicket[k + 1]);
+                    }
+                }
+                if(swapped == false)
+                    break;
+            }
+        }
+        cout << "Danh sach sau khi sap xep la:" << endl;
+        for(int i = 0; i < temp.size(); i++)
+            temp[i].detailBill();
+    }
+
+    void thongke(){
+        cout << left << setw(15) << "Họ ten NM" << setw(15) << "Thanh tien" << endl;
+        vector<Bill> temp = getBillVector();
+        for(int i = 0; i < temp.size(); i++){
+            int sum = 0;
+            for(int j = 0; j < temp[i].ticketTotal; j++)
+                sum += temp[i].numOfTicket[j] * temp[i].t[j].price;
+            cout << left << setw(15) << temp[i].getName() << setw(15) << sum << endl;
+        }
+    }
 };
 int TicketBuyer::ticketBuyerIDConst = 10000;
 int Ticket::ticketIDConst = 100;
 int main(){
-    vector<TicketBuyer> tbs;
-    ifstream ifs("NGUOIMUA.DAT");
-    while(ifs){
-        TicketBuyer tb;
-        tb.readOneByOne(ifs);
-        if(!ifs.eof())
-            tbs.push_back(tb);
-    }
-    Bill b[tbs.size()];
-    for(int i = 0; i < tbs.size(); i++)
-        b[i].addBill(tbs[i]);
-    Bill b1;
-    b1.displayAllBill();
+//    vector<TicketBuyer> tbs;
+//    ifstream ifs("NGUOIMUA.DAT");
+//    while(!ifs.eof()){
+//        TicketBuyer tb;
+//        tb.readOneByOne(ifs);
+//        if(!ifs.eof())
+//            tbs.push_back(tb);
+//    }
+//    ifs.close();
+    Bill b;
+//    for(int i = 0; i < tbs.size(); i++)
+//        b.addBill(tbs[i]);
+    b.displayAllBill();
+    b.thongke();
     return 0;
 }
