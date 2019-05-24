@@ -239,7 +239,7 @@ public:
     }
 
     void thongke(){
-        cout << left << setw(15) << "Họ ten NM" << setw(15) << "Thanh tien" << endl;
+        cout << left << setw(15) << "Ho ten NM" << setw(15) << "Thanh tien" << endl;
         vector<Bill> temp = getBillVector();
         for(int i = 0; i < temp.size(); i++){
             int sum = 0;
