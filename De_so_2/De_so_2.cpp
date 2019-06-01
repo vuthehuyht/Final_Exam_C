@@ -300,8 +300,17 @@ int main(){
     for(int i = 0;i < drs.size(); i++)
         a.addWord(drs[i]);
     */
-    AssignTable a;
-   // a.sortByTurn();
-    a.thongke();
+    vector<AssignTable> temp;
+        ifstream ifs("PHANCONG.DAT");
+        while(!ifs.eof()){
+            AssignTable a;
+            a.readOneByOne(ifs);
+            if(!ifs.eof()){
+                temp.push_back(a);
+            }
+        }
+        ifs.close();
+        for(int i = 0; i < temp.size(); i++)
+            temp[i].workInfor();
     return 0;
 }
